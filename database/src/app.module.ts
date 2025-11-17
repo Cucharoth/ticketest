@@ -9,6 +9,7 @@ import { LoggerModule } from 'nestjs-pino';
 @Module({
   imports: [
     ConfigModule.forRoot({
+      envFilePath: '.env',
       cache: true,
       isGlobal: true,
       load: [configuration],
