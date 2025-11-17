@@ -2,7 +2,7 @@ services:
   db-postgres:
     hostname: db.local
     container_name: db.local
-    image: postgres:latest
+    image: postgres:16-alpine
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
@@ -14,11 +14,11 @@ services:
       - PGTZ=America/Santiago
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ticket_test_db
     ports:
       - '11000:5432'
     volumes: 
       - db_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - ticket_test_network
 
