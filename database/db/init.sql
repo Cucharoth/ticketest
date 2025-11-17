@@ -1,1 +1,1 @@
-CREATE DATABASE IF NOT EXITS ticket_test_db;
+CREATE DATABASE IF NOT EXISTS ticket_test_db;
