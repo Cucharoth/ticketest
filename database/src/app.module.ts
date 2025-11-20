@@ -5,6 +5,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { LoggerModule } from 'nestjs-pino';
+import { AttendeeModule } from './modules/attendee/attendee.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { LoggerModule } from 'nestjs-pino';
             },
     }),
     PrismaModule,
+    AttendeeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
