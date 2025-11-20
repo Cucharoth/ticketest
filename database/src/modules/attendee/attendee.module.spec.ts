@@ -7,21 +7,26 @@ import { PrismaService } from '../prisma/prisma.service';
 describe('AttendeeModule', () => {
   let module: TestingModule;
 
+  const mockPrismaService = {
+    attendee: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+  };
+
   beforeEach(async () => {
     module = await Test.createTestingModule({
       imports: [AttendeeModule],
-    })
-      .overrideProvider(PrismaService)
-      .useValue({
-        attendee: {
-          create: jest.fn(),
-          findMany: jest.fn(),
-          findUnique: jest.fn(),
-          update: jest.fn(),
-          delete: jest.fn(),
+      providers: [
+        {
+          provide: PrismaService,
+          useValue: mockPrismaService,
         },
-      })
-      .compile();
+      ],
+    }).compile();
   });
 
   it('should be defined', () => {
