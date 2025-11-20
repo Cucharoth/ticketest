@@ -19,29 +19,21 @@ import { LoggerModule } from 'nestjs-pino';
         process.env.NODE_ENV === 'production'
           ? {
               level: process.env.LOG_LEVEL || 'info',
-              messageKey: 'message',
-              serializers: {
-                req: () => undefined,
-                res: () => undefined,
-              },
+              autoLogging: false,
             }
           : {
               transport: {
                 target: 'pino-pretty',
                 options: {
-                  messageKey: 'message',
                   colorize: true,
                   singleLine: true,
                   levelFirst: true,
                   translateTime: 'HH:MM:ss',
+                  ignore: 'pid,hostname',
                 },
               },
-              level: process.env.LOG_LEVEL || 'debug',
-              messageKey: 'message',
-              serializers: {
-                req: () => undefined,
-                res: () => undefined,
-              },
+              level: process.env.LOG_LEVEL || 'info',
+              autoLogging: false,
             },
     }),
     PrismaModule,
