@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AttendeeModule } from './attendee.module';
 import { AttendeeService } from './attendee.service';
 import { AttendeeController } from './attendee.controller';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,12 +14,15 @@ describe('AttendeeModule', () => {
       update: jest.fn(),
       delete: jest.fn(),
     },
+    $connect: jest.fn(),
+    $disconnect: jest.fn(),
   };
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      imports: [AttendeeModule],
       providers: [
+        AttendeeService,
+        AttendeeController,
         {
           provide: PrismaService,
           useValue: mockPrismaService,
@@ -33,9 +35,10 @@ describe('AttendeeModule', () => {
     expect(module).toBeDefined();
   });
 
-  it('should export AttendeeService', () => {
+  it('should provide AttendeeService', () => {
     const service = module.get<AttendeeService>(AttendeeService);
     expect(service).toBeDefined();
+    expect(service).toBeInstanceOf(AttendeeService);
   });
 
   it('should provide AttendeeController', () => {
@@ -43,8 +46,10 @@ describe('AttendeeModule', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should have PrismaService as dependency', () => {
+  it('should inject PrismaService into AttendeeService', () => {
+    const service = module.get<AttendeeService>(AttendeeService);
+    expect(service).toBeDefined();
     const prismaService = module.get<PrismaService>(PrismaService);
-    expect(prismaService).toBeDefined();
+    expect(prismaService).toBe(mockPrismaService);
   });
 });
