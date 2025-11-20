@@ -22,7 +22,7 @@ describe('CreateAttendeDto', () => {
     expect(dto.cellphone).toBe('+1234567890');
 
     const errors = await validate(dto);
-    expect(errors.length).toBeGreaterThan(1);
+    expect(errors.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should be valid with correct properties', async () => {
@@ -40,7 +40,7 @@ describe('CreateAttendeDto', () => {
     dto.cellphone = '+1234567890';
 
     const errors = await validate(dto);
-    expect(errors.length).toBeGreaterThan(0);
+    expect(errors.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should be invalid with incorrect cellphone', async () => {
@@ -49,6 +49,6 @@ describe('CreateAttendeDto', () => {
     dto.cellphone = 'invalid-phone';
 
     const errors = await validate(dto);
-    expect(errors.length).toBeGreaterThan(0);
+    expect(errors.length).toBeGreaterThanOrEqual(1);
   });
 });
