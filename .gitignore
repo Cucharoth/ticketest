@@ -24,5 +24,5 @@ lerna-debug.log*
 .tmp
 
 # Ignore all markdown files
-*.md
+
 !README.md
