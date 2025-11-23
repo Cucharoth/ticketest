@@ -19,6 +19,7 @@ describe('Application E2E Tests', () => {
   let attendeeId: string;
   let eventTypeId: string;
   let eventId: string;
+  let attendeeEventId: string;
   let notificationTypeId: string;
   let notificationId: string;
   let ticketTypeId: string;
@@ -183,6 +184,51 @@ describe('Application E2E Tests', () => {
     });
   });
 
+  describe('AttendeeEvents Module', () => {
+    it('/attendee-events (POST) - should create attendee-event', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/attendee-events')
+        .send({
+          eventId,
+          attendeeId,
+        })
+        .expect(201);
+
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.eventId).toBe(eventId);
+      expect(response.body.attendeeId).toBe(attendeeId);
+      attendeeEventId = response.body.id;
+    });
+
+    it('/attendee-events (GET) - should return all attendee-events', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/attendee-events')
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
+
+    it('/attendee-events/:id (GET) - should return single attendee-event', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/attendee-events/${attendeeEventId}`)
+        .expect(200);
+
+      expect(response.body.id).toBe(attendeeEventId);
+      expect(response.body.eventId).toBe(eventId);
+      expect(response.body.attendeeId).toBe(attendeeId);
+    });
+
+    it('/attendee-events/:id (PATCH) - should update attendee-event', async () => {
+      const response = await request(app.getHttpServer())
+        .patch(`/attendee-events/${attendeeEventId}`)
+        .send({})
+        .expect(200);
+
+      expect(response.body.id).toBe(attendeeEventId);
+    });
+  });
+
   describe('Notifications Module', () => {
     beforeAll(async () => {
       // Create notification type
@@ -322,6 +368,19 @@ describe('Application E2E Tests', () => {
       // Verify deletion
       await request(app.getHttpServer())
         .get(`/notifications/${notificationId}`)
+        .expect(404);
+    });
+
+    it('/attendee-events/:id (DELETE) - should delete attendee-event', async () => {
+      const response = await request(app.getHttpServer())
+        .delete(`/attendee-events/${attendeeEventId}`)
+        .expect(200);
+
+      expect(response.body.id).toBe(attendeeEventId);
+
+      // Verify deletion
+      await request(app.getHttpServer())
+        .get(`/attendee-events/${attendeeEventId}`)
         .expect(404);
     });
 
