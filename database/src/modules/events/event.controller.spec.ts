@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Event } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventController } from './event.controller';
+import { EventService } from './event.service';
 
 const mockEvents: Event[] = [
   {

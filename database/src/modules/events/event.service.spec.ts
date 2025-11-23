@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventService } from './event.service';
 
 describe('EventService', () => {
+  let service: EventService;
   const mockPrismaService = {
     event: {
       create: jest.fn(),
