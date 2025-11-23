@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, IsDateString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsDate, IsUUID } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateNotificationDto {
   @IsNotEmpty()
@@ -6,7 +7,8 @@ export class CreateNotificationDto {
   message: string;
 
   @IsNotEmpty()
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   sendDate: Date;
 
   @IsNotEmpty()

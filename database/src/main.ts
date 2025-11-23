@@ -6,7 +6,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 
-async function bootstrap() {
+export async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({ logger: false }),
@@ -22,9 +22,15 @@ async function bootstrap() {
 
   app.enableShutdownHooks();
 
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port, '127.0.0.1');
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+  await app.listen(port, '0.0.0.0');
 
   logger.log(`Server is running on http://localhost:${port}`);
+
+  return app;
 }
-void bootstrap();
+
+// Only run bootstrap if this file is executed directly
+if (require.main === module) {
+  void bootstrap();
+}

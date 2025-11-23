@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { validate } from 'class-validator';
 import { UpdateNotificationDto } from './update-notification.dto';
 
