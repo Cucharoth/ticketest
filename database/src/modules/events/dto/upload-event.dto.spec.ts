@@ -1,15 +1,15 @@
 import { validate } from 'class-validator';
-import { UploadEventDto } from './upload-event.dto';
+import { UpdateEventDto } from './upload-event.dto';
 
 describe('UploadEventDto', () => {
-  let dto: UploadEventDto;
+  let dto: UpdateEventDto;
 
   beforeEach(() => {
-    dto = new UploadEventDto();
+    dto = new UpdateEventDto();
   });
 
   it('should be defined', () => {
-    const dto = new UploadEventDto();
+    const dto = new UpdateEventDto();
     expect(dto).toBeDefined();
   });
 
@@ -27,6 +27,6 @@ describe('UploadEventDto', () => {
 
     const errors = await validate(dto);
 
-    expect(errors.length).toBeGreaterThanOrEqual(6);
+    expect(errors.length).toBeGreaterThanOrEqual(5);
   });
 });

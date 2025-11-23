@@ -14,7 +14,7 @@ describe('CreateEventDto', () => {
 
   it('should have correct properties', async () => {
     dto.name = 'Sample Event';
-    dto.date = new Date('2024-12-31T23:59:59Z').toString();
+    dto.date = '2024-12-31T23:59:59.000Z';
     dto.place = 'Sample Place';
     dto.ticketMax = 100;
     dto.typeId = '123e4567-e89b-12d3-a456-426614174000';

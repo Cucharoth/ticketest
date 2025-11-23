@@ -4,7 +4,7 @@ services:
     container_name: db.local
     image: postgres:16-alpine
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 2s
       timeout: 1s
       retries: 10
@@ -17,10 +17,47 @@ services:
       - POSTGRES_DB=ticket_test_db
     ports:
       - '11000:5432'
-    volumes: 
+    volumes:
       - db_data:/var/lib/postgresql/data
     networks:
       - ticket_test_network
+
+  backend.database-module.local:
+    hostname: backend.database-module.local
+    container_name: backend.database-module.local
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+      target: production
+    ports:
+      - '3001:3000'
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - ticket_test_network
+    depends_on:
+      - db-postgres
+    # Graceful shutdown configuration
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
+    # Health check
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    # Restart policy
+    restart: unless-stopped
 
 volumes:
   db_data:
