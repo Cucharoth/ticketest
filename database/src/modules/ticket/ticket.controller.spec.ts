@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '@prisma/client';
+import { TicketController } from './ticket.controller';
+import { TicketService } from './ticket.service';
 
 describe('TicketController', () => {
   let controller: TicketController;
-  let service: TicketService;
 
   const mockTicket = {
     id: '123e4567-e89b-12d3-a456-426614174000',
