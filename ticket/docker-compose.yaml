@@ -1,0 +1,37 @@
+services:
+  backend.ticket-module.local:
+    hostname: backend.ticket-module.local
+    container_name: backend.ticket-module.local
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    ports:
+      - "3002:3000"
+    env_file:
+      - .env
+    environment:
+      - ENV=production
+      - DOWNSTREAM_BASE_URL=${DOWNSTREAM_BASE_URL}
+      - TICKET_SERVICE_PORT=8080
+    networks:
+      - ticket_test_network
+    # Graceful shutdown configuration
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
+    # Health check
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+
+networks:
+  ticket_test_network:
+    external: true
