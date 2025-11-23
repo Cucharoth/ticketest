@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { validate } from 'class-validator';
 import { UpdateTicketDto } from './update-ticket.dto';
 
@@ -17,7 +18,7 @@ describe('UpdateTicketDto', () => {
   });
 
   it('should return errors when invalid properties are set', async () => {
-    dto.price = -10.00;
+    dto.price = -10.0;
     dto.typeId = 'invalid-uuid';
 
     const errors = await validate(dto);
@@ -25,7 +26,7 @@ describe('UpdateTicketDto', () => {
   });
 
   it('should be valid with partial update (price only)', async () => {
-    dto.price = 75.50;
+    dto.price = 75.5;
 
     const errors = await validate(dto);
     expect(errors.length).toBe(0);
@@ -47,7 +48,7 @@ describe('UpdateTicketDto', () => {
   });
 
   it('should be invalid with negative price', async () => {
-    dto.price = -50.00;
+    dto.price = -50.0;
 
     const errors = await validate(dto);
     expect(errors.length).toBeGreaterThanOrEqual(1);
