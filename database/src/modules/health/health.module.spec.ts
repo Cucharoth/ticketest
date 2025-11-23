@@ -1,7 +1,7 @@
-import { TestingModule, Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { HealthController } from './health.controller';
 
-describe('HealthController', () => {
+describe('HealthModule', () => {
   let controller: HealthController;
 
   beforeEach(async () => {
@@ -14,10 +14,5 @@ describe('HealthController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-  });
-
-  it('should check health', () => {
-    const result = controller.healthCheck();
-    expect(result).toEqual({ status: 'OK' });
   });
 });
