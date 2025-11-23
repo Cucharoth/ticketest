@@ -1,5 +1,12 @@
 # notification
 
+### TESTING
+
+```
+uv run pytest tests/ -v --cov=app/services --cov-report=term-missing
+```
+
+
 ### install dependencies
 
 
@@ -17,7 +24,7 @@ add a dev dep
 ```
 uv add [dep] --group dev
 
-prod deps
+prod
 ```
 uv sync --group default
 ```

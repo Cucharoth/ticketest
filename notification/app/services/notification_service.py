@@ -1,4 +1,5 @@
 import httpx
+from datetime import datetime, timezone
 from app.dto.notification_dto import SendNotificationRequest
 from app.utils.logger import Logger
 from app.config import settings
@@ -55,7 +56,8 @@ class NotificationService:
              raise e
 
     async def _send_message(self, type: str, attendee_id: str, message: str, recipient_email: str = None):
-        if type == "email" and recipient_email:
+        # Email UUID: 30000000-0000-0000-0000-000000000001
+        if type == "30000000-0000-0000-0000-000000000001" and recipient_email:
              email_service = EmailService()
              await email_service.send_email(recipient_email, "Notification from Ticketest", message)
         else:
@@ -69,6 +71,7 @@ class NotificationService:
                 notification_data = {
                     "attendeeId": attendee_id,
                     "message": message,
+                    "sendDate": datetime.now(timezone.utc).isoformat(),
                     "type": type
                 }
                 response = client.post(f"{DB_SERVICE_URL}/notifications", json=notification_data)
