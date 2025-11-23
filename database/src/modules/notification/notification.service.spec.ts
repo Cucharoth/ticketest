@@ -2,8 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { NotificationService } from './notification.service';
 
 describe('NotificationService', () => {
+  let service: NotificationService;
   const mockNotification = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     message: 'Your ticket has been confirmed',
@@ -179,7 +181,9 @@ describe('NotificationService', () => {
         mockNotifications,
       );
 
-      const result = await service.findByAttendeeId(mockNotification.attendeeId);
+      const result = await service.findByAttendeeId(
+        mockNotification.attendeeId,
+      );
 
       expect(result).toEqual(mockNotifications);
       expect(mockPrismaService.notification.findMany).toHaveBeenCalledWith({
