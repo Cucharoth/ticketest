@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { validate } from 'class-validator';
+import { CreateAttendeeEventDto } from './create-attendee-event.dto';
 
 describe('CreateAttendeeEventDto', () => {
   let dto: CreateAttendeeEventDto;
