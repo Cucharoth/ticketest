@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { LoggerModule } from 'nestjs-pino';
 import { AttendeeModule } from './modules/attendee/attendee.module';
+import { EventModule } from './modules/events/event.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AttendeeModule } from './modules/attendee/attendee.module';
     }),
     PrismaModule,
     AttendeeModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [AppService],
