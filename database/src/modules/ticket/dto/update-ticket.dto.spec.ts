@@ -1,4 +1,5 @@
 import { validate } from 'class-validator';
+import { UpdateTicketDto } from './update-ticket.dto';
 
 describe('UpdateTicketDto', () => {
   let dto: UpdateTicketDto;
