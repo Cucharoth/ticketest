@@ -13,9 +13,7 @@ import { UpdateAttendeeEventDto } from './dto/update-attendee-event.dto';
 export class AttendeeEventService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    createDto: CreateAttendeeEventDto,
-  ): Promise<AttendeeEvent> {
+  async create(createDto: CreateAttendeeEventDto): Promise<AttendeeEvent> {
     try {
       return await this.prisma.attendeeEvent.create({
         data: {
@@ -56,6 +54,27 @@ export class AttendeeEventService {
     }
 
     return attendeeEvent;
+  }
+
+  async findAllByEventIdAndAttendeeId(
+    eventId: string,
+    attendeeId: string,
+  ): Promise<AttendeeEvent[]> {
+    const attendeeEvents = await this.prisma.attendeeEvent.findMany({
+      where: {
+        attendeeId: attendeeId,
+        eventId: eventId,
+      },
+    });
+
+    // If no events found for the attendee, throw NotFoundException
+    if (attendeeEvents.length === 0) {
+      throw new NotFoundException(
+        `No events found for Attendee with ID ${attendeeId}`,
+      );
+    }
+
+    return attendeeEvents;
   }
 
   async update(
