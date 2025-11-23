@@ -1,4 +1,5 @@
 import { validate } from 'class-validator';
+import { CreateNotificationDto } from './create-notification.dto';
 
 describe('CreateNotificationDto', () => {
   let dto: CreateNotificationDto;
@@ -11,7 +12,7 @@ describe('CreateNotificationDto', () => {
     expect(dto).toBeDefined();
   });
 
-  it('should have message, sendDate, attendeeId, and type properties', async () => {
+  it('should have message, sendDate, attendeeId, and type properties', () => {
     dto.message = 'Test notification message';
     dto.sendDate = new Date();
     dto.attendeeId = '123e4567-e89b-12d3-a456-426614174000';
@@ -45,6 +46,7 @@ describe('CreateNotificationDto', () => {
 
   it('should be invalid with invalid sendDate', async () => {
     dto.message = 'Test message';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     dto.sendDate = 'invalid-date' as any;
     dto.attendeeId = '123e4567-e89b-12d3-a456-426614174000';
     dto.type = '123e4567-e89b-12d3-a456-426614174001';
