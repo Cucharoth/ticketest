@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from app.router.test_router import test_router
+from app.router.notification_router import router as notification_router
 from app.utils.logger import Logger
 
 logger = Logger()
@@ -23,3 +24,4 @@ def health() -> dict[str, str]:
    }
 
 app_router.include_router(test_router)
+app_router.include_router(notification_router)

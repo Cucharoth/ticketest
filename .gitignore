@@ -22,3 +22,7 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# Ignore all markdown files
+*.md
+!README.md
