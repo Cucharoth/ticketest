@@ -3,15 +3,17 @@ from app.dto.notification_dto import SendNotificationRequest
 from app.utils.logger import Logger
 from app.config import settings
 from app.utils.exceptions import AttendeeNotFoundException
+from app.services.email_service import EmailService
 
 logger = Logger()
 DB_SERVICE_URL = settings.DB_SERVICE_URL
 
 class NotificationService:
-    def send_notification(self, request: SendNotificationRequest) -> dict:
+    async def send_notification(self, request: SendNotificationRequest) -> dict:
         attendee = self._get_attendee(request.attendee_id)
         
-        self._send_message(request.type, request.attendee_id, request.message)
+        email = attendee.get('email') if attendee else None
+        await self._send_message(request.type, request.attendee_id, request.message, email)
         self._log_notification(request.attendee_id, request.message, request.type)
         
         return {
@@ -52,9 +54,13 @@ class NotificationService:
              logger.error(f"[NotificationService] Unexpected error fetching attendee: {str(e)}")
              raise e
 
-    def _send_message(self, type: str, attendee_id: str, message: str):
-        # Mock sending logic (FR-NOT-001)
-        logger.info(f"[NotificationService] Sending {type} to attendee_id={attendee_id}: {message}")
+    async def _send_message(self, type: str, attendee_id: str, message: str, recipient_email: str = None):
+        if type == "email" and recipient_email:
+             email_service = EmailService()
+             await email_service.send_email(recipient_email, "Notification from Ticketest", message)
+        else:
+            # Mock sending logic for other types (FR-NOT-001)
+            logger.info(f"[NotificationService] Sending {type} to attendee_id={attendee_id}: {message}")
 
     def _log_notification(self, attendee_id: str, message: str, type: str):
         logger.info(f"[NotificationService] Logging notification to history for attendee_id={attendee_id}")

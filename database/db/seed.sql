@@ -46,7 +46,7 @@ INSERT INTO "notification_type" (id, type, "createdAt", "updatedAt") VALUES
 -- =====================================================
 INSERT INTO "attendee" (id, name, email, cellphone, "createdAt", "updatedAt") VALUES
 ('40000000-0000-0000-0000-000000000001', 'John Doe', 'john.doe@example.com', '+1234567890', NOW(), NOW()),
-('40000000-0000-0000-0000-000000000002', 'Jane Smith', 'jane.smith@example.com', '+0987654321', NOW(), NOW());
+('40000000-0000-0000-0000-000000000002', 'Cucharoth', 'cucharoth@gmail.com', '+0987654321', NOW(), NOW());
 
 -- =====================================================
 -- Events

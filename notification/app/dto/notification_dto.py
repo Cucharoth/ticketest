@@ -4,7 +4,7 @@ from typing import Literal
 class SendNotificationRequest(BaseModel):
     attendee_id: str
     message: str
-    type: Literal["email", "sms"]
+    type: Literal["Email", "SMS"]
 
 class NotificationHistoryResponse(BaseModel):
     id: int

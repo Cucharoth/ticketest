@@ -9,13 +9,13 @@ notification_service = NotificationService()
 logger = Logger()
 
 @router.post("/notifications/send", status_code=200)
-def send_notification(request: SendNotificationRequest):
+async def send_notification(request: SendNotificationRequest):
     """
     Send a notification to an assistant.
     """
     try:
         logger.info(f"[NotificationRouter] Received send request for attendee_id={request.attendee_id}")
-        result = notification_service.send_notification(request)
+        result = await notification_service.send_notification(request)
         return result
     except AttendeeNotFoundException as e:
         logger.error(f"[NotificationRouter] {str(e)}")
