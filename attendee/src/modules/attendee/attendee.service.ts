@@ -19,6 +19,7 @@ export class AttendeeService {
   }
 
   async create(createAttendeeDto: CreateAttendeeDto) {
+    this.logger.log(`Creating Attendee name: ${createAttendeeDto.name}`);
     try {
       const { data } = await firstValueFrom(
         this.httpService.post(`${this.dbServiceUrl}/attendees`, createAttendeeDto),
@@ -30,6 +31,7 @@ export class AttendeeService {
   }
 
   async findAll() {
+    this.logger.log(`Finding all Attendees`);
     try {
       const { data } = await firstValueFrom(
         this.httpService.get(`${this.dbServiceUrl}/attendees`),
@@ -41,6 +43,7 @@ export class AttendeeService {
   }
 
   async findOne(id: string) {
+    this.logger.log(`Finding Attendee by id: ${id}`);
     try {
       const { data } = await firstValueFrom(
         this.httpService.get(`${this.dbServiceUrl}/attendees/${id}`),
@@ -52,6 +55,7 @@ export class AttendeeService {
   }
 
   async update(id: string, updateAttendeeDto: UpdateAttendeeDto) {
+    this.logger.log(`Updating Attendee by id: ${id}`);
     try {
       const { data } = await firstValueFrom(
         this.httpService.patch(`${this.dbServiceUrl}/attendees/${id}`, updateAttendeeDto),
@@ -63,6 +67,7 @@ export class AttendeeService {
   }
 
   async remove(id: string) {
+    this.logger.log(`Removing Attendee by id: ${id}`);
     try {
       const { data } = await firstValueFrom(
         this.httpService.delete(`${this.dbServiceUrl}/attendees/${id}`),
@@ -74,10 +79,17 @@ export class AttendeeService {
   }
 
   private handleError(error: any) {
-    this.logger.error(error);
     if (error instanceof AxiosError) {
+      const { method, url } = error.config || {};
+      const { status, statusText } = error.response || {};
+      this.logger.error(
+        `[DB Error] ${method?.toUpperCase()} ${url} - ${status} ${statusText}: ${JSON.stringify(
+          error.response?.data,
+        )}`,
+      );
       throw error.response?.data || error.message;
     }
+    this.logger.error(`[Internal Error] ${error.message}`, error.stack);
     throw error;
   }
 }
