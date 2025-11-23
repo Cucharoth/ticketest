@@ -30,6 +30,18 @@ export class AttendeeEventController {
     return await this.attendeeEventService.findAll();
   }
 
+  @Get(':id/attendees/:attendeeId')
+  @HttpCode(200)
+  async findAllByEventAndAttendee(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('attendeeId', ParseUUIDPipe) attendeeId: string,
+  ): Promise<AttendeeEvent[]> {
+    return await this.attendeeEventService.findAllByEventIdAndAttendeeId(
+      id,
+      attendeeId,
+    );
+  }
+
   @Get(':id')
   @HttpCode(200)
   async findOne(
