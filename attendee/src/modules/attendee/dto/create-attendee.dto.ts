@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateAttendeeDto {
   @IsString()
@@ -8,4 +8,11 @@ export class CreateAttendeeDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Matches(/^[\d\s+\-()]+$/, {
+    message: 'Cellphone must be a valid phone number',
+  })
+  cellphone: string;
 }
