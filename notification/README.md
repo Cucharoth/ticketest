@@ -6,27 +6,19 @@
 uv run pytest tests/ -v --cov=app/services --cov-report=term-missing
 ```
 
+### ENDPOINT
+
+`POST /api/notifications/send`
+`GET /api/notifications/history`
+
+
 
 ### install dependencies
 
 
-install all deps (if working on just fastapi)
+install all deps
 ```
 uv sync
-```
-
-dev deps if working on something not needed in prod.
-```
-uv sync --group dev
-```
-
-add a dev dep
-```
-uv add [dep] --group dev
-
-prod
-```
-uv sync --group default
 ```
 
 
