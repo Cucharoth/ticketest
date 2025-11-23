@@ -227,216 +227,233 @@ describe('Application E2E Tests', () => {
 
       expect(response.body.id).toBe(attendeeEventId);
     });
-  });
 
-  describe('Notifications Module', () => {
-    beforeAll(async () => {
-      // Create notification type
-      const notifType = await prisma.notificationType.create({
-        data: { type: 'EMAIL' },
+    it('/attendee-events/:id/attendees/:attendeeId (GET) - should return attendee-events for given event and attendee', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/attendee-events/${eventId}/attendees/${attendeeId}`)
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      // There should be at least one mapping created earlier in the flow
+      expect(response.body.length).toBeGreaterThan(0);
+      // Validate the first returned item matches the requested attendee and event
+      expect(response.body[0].attendeeId).toBe(attendeeId);
+      expect(response.body[0].eventId).toBe(eventId);
+    });
+
+    describe('Notifications Module', () => {
+      beforeAll(async () => {
+        // Create notification type
+        const notifType = await prisma.notificationType.create({
+          data: { type: 'EMAIL' },
+        });
+        notificationTypeId = notifType.id;
       });
-      notificationTypeId = notifType.id;
-    });
 
-    it('/notifications (POST) - should create a notification', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/notifications')
-        .send({
-          message: 'Your ticket has been confirmed',
-          sendDate: new Date('2024-12-25T10:00:00Z').toISOString(),
-          attendeeId: attendeeId,
-          type: notificationTypeId,
-        })
-        .expect(201);
+      it('/notifications (POST) - should create a notification', async () => {
+        const response = await request(app.getHttpServer())
+          .post('/notifications')
+          .send({
+            message: 'Your ticket has been confirmed',
+            sendDate: new Date('2024-12-25T10:00:00Z').toISOString(),
+            attendeeId: attendeeId,
+            type: notificationTypeId,
+          })
+          .expect(201);
 
-      expect(response.body).toHaveProperty('id');
-      expect(response.body.message).toBe('Your ticket has been confirmed');
-      notificationId = response.body.id;
-    });
-
-    it('/notifications (GET) - should return all notifications', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/notifications')
-        .expect(200);
-
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
-    });
-
-    it('/notifications/:id (GET) - should return single notification', async () => {
-      const response = await request(app.getHttpServer())
-        .get(`/notifications/${notificationId}`)
-        .expect(200);
-
-      expect(response.body.id).toBe(notificationId);
-      expect(response.body.message).toBe('Your ticket has been confirmed');
-    });
-
-    it('/notifications/attendee/:attendeeId (GET) - should return attendee notifications', async () => {
-      const response = await request(app.getHttpServer())
-        .get(`/notifications/attendee/${attendeeId}`)
-        .expect(200);
-
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
-    });
-
-    it('/notifications/:id (PATCH) - should update notification', async () => {
-      const response = await request(app.getHttpServer())
-        .patch(`/notifications/${notificationId}`)
-        .send({ message: 'Updated notification message' })
-        .expect(200);
-
-      expect(response.body.message).toBe('Updated notification message');
-    });
-  });
-
-  describe('Tickets Module', () => {
-    beforeAll(async () => {
-      // Create ticket type
-      const tickType = await prisma.ticketType.create({
-        data: { type: 'VIP' },
+        expect(response.body).toHaveProperty('id');
+        expect(response.body.message).toBe('Your ticket has been confirmed');
+        notificationId = response.body.id;
       });
-      ticketTypeId = tickType.id;
+
+      it('/notifications (GET) - should return all notifications', async () => {
+        const response = await request(app.getHttpServer())
+          .get('/notifications')
+          .expect(200);
+
+        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body.length).toBeGreaterThan(0);
+      });
+
+      it('/notifications/:id (GET) - should return single notification', async () => {
+        const response = await request(app.getHttpServer())
+          .get(`/notifications/${notificationId}`)
+          .expect(200);
+
+        expect(response.body.id).toBe(notificationId);
+        expect(response.body.message).toBe('Your ticket has been confirmed');
+      });
+
+      it('/notifications/attendee/:attendeeId (GET) - should return attendee notifications', async () => {
+        const response = await request(app.getHttpServer())
+          .get(`/notifications/attendee/${attendeeId}`)
+          .expect(200);
+
+        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body.length).toBeGreaterThan(0);
+      });
+
+      it('/notifications/:id (PATCH) - should update notification', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/notifications/${notificationId}`)
+          .send({ message: 'Updated notification message' })
+          .expect(200);
+
+        expect(response.body.message).toBe('Updated notification message');
+      });
     });
 
-    it('/tickets (POST) - should create a ticket', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/tickets')
-        .send({
-          price: 99.99,
-          typeId: ticketTypeId,
-        })
-        .expect(201);
+    describe('Tickets Module', () => {
+      beforeAll(async () => {
+        // Create ticket type
+        const tickType = await prisma.ticketType.create({
+          data: { type: 'VIP' },
+        });
+        ticketTypeId = tickType.id;
+      });
 
-      expect(response.body).toHaveProperty('id');
-      expect(parseFloat(response.body.price)).toBe(99.99);
-      ticketId = response.body.id;
+      it('/tickets (POST) - should create a ticket', async () => {
+        const response = await request(app.getHttpServer())
+          .post('/tickets')
+          .send({
+            price: 99.99,
+            typeId: ticketTypeId,
+          })
+          .expect(201);
+
+        expect(response.body).toHaveProperty('id');
+        expect(parseFloat(response.body.price)).toBe(99.99);
+        ticketId = response.body.id;
+      });
+
+      it('/tickets (GET) - should return all tickets', async () => {
+        const response = await request(app.getHttpServer())
+          .get('/tickets')
+          .expect(200);
+
+        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body.length).toBeGreaterThan(0);
+      });
+
+      it('/tickets/:id (GET) - should return single ticket', async () => {
+        const response = await request(app.getHttpServer())
+          .get(`/tickets/${ticketId}`)
+          .expect(200);
+
+        expect(response.body.id).toBe(ticketId);
+      });
+
+      it('/tickets/type/:typeId (GET) - should return tickets by type', async () => {
+        const response = await request(app.getHttpServer())
+          .get(`/tickets/type/${ticketTypeId}`)
+          .expect(200);
+
+        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body.length).toBeGreaterThan(0);
+      });
+
+      it('/tickets/:id (PATCH) - should update ticket', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/tickets/${ticketId}`)
+          .send({ price: 149.99 })
+          .expect(200);
+
+        expect(parseFloat(response.body.price)).toBe(149.99);
+      });
+
+      it('/tickets (POST) - should fail with invalid price', async () => {
+        await request(app.getHttpServer())
+          .post('/tickets')
+          .send({ price: -10, typeId: ticketTypeId })
+          .expect(400);
+      });
     });
 
-    it('/tickets (GET) - should return all tickets', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/tickets')
-        .expect(200);
+    describe('Delete Operations', () => {
+      it('/notifications/:id (DELETE) - should delete notification', async () => {
+        const response = await request(app.getHttpServer())
+          .delete(`/notifications/${notificationId}`)
+          .expect(200);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
+        expect(response.body.id).toBe(notificationId);
+
+        // Verify deletion
+        await request(app.getHttpServer())
+          .get(`/notifications/${notificationId}`)
+          .expect(404);
+      });
+
+      it('/attendee-events/:id (DELETE) - should delete attendee-event', async () => {
+        const response = await request(app.getHttpServer())
+          .delete(`/attendee-events/${attendeeEventId}`)
+          .expect(200);
+
+        expect(response.body.id).toBe(attendeeEventId);
+
+        // Verify deletion
+        await request(app.getHttpServer())
+          .get(`/attendee-events/${attendeeEventId}`)
+          .expect(404);
+      });
+
+      it('/tickets/:id (DELETE) - should delete ticket', async () => {
+        const response = await request(app.getHttpServer())
+          .delete(`/tickets/${ticketId}`)
+          .expect(200);
+
+        expect(response.body.id).toBe(ticketId);
+
+        // Verify deletion
+        await request(app.getHttpServer())
+          .get(`/tickets/${ticketId}`)
+          .expect(404);
+      });
+
+      it('/events/:id (DELETE) - should delete event', async () => {
+        const response = await request(app.getHttpServer())
+          .delete(`/events/${eventId}`)
+          .expect(200);
+
+        expect(response.body.id).toBe(eventId);
+
+        // Verify deletion
+        await request(app.getHttpServer())
+          .get(`/events/${eventId}`)
+          .expect(404);
+      });
+
+      it('/attendees/:id (DELETE) - should delete attendee', async () => {
+        const response = await request(app.getHttpServer())
+          .delete(`/attendees/${attendeeId}`)
+          .expect(200);
+
+        expect(response.body.id).toBe(attendeeId);
+
+        // Verify deletion
+        await request(app.getHttpServer())
+          .get(`/attendees/${attendeeId}`)
+          .expect(404);
+      });
     });
 
-    it('/tickets/:id (GET) - should return single ticket', async () => {
-      const response = await request(app.getHttpServer())
-        .get(`/tickets/${ticketId}`)
-        .expect(200);
+    describe('Error Handling', () => {
+      it('should return 404 for non-existent attendee', async () => {
+        await request(app.getHttpServer())
+          .get('/attendees/123e4567-e89b-12d3-a456-426614174999')
+          .expect(404);
+      });
 
-      expect(response.body.id).toBe(ticketId);
-    });
+      it('should return 400 for invalid UUID', async () => {
+        await request(app.getHttpServer())
+          .get('/attendees/invalid-uuid')
+          .expect(400);
+      });
 
-    it('/tickets/type/:typeId (GET) - should return tickets by type', async () => {
-      const response = await request(app.getHttpServer())
-        .get(`/tickets/type/${ticketTypeId}`)
-        .expect(200);
-
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
-    });
-
-    it('/tickets/:id (PATCH) - should update ticket', async () => {
-      const response = await request(app.getHttpServer())
-        .patch(`/tickets/${ticketId}`)
-        .send({ price: 149.99 })
-        .expect(200);
-
-      expect(parseFloat(response.body.price)).toBe(149.99);
-    });
-
-    it('/tickets (POST) - should fail with invalid price', async () => {
-      await request(app.getHttpServer())
-        .post('/tickets')
-        .send({ price: -10, typeId: ticketTypeId })
-        .expect(400);
-    });
-  });
-
-  describe('Delete Operations', () => {
-    it('/notifications/:id (DELETE) - should delete notification', async () => {
-      const response = await request(app.getHttpServer())
-        .delete(`/notifications/${notificationId}`)
-        .expect(200);
-
-      expect(response.body.id).toBe(notificationId);
-
-      // Verify deletion
-      await request(app.getHttpServer())
-        .get(`/notifications/${notificationId}`)
-        .expect(404);
-    });
-
-    it('/attendee-events/:id (DELETE) - should delete attendee-event', async () => {
-      const response = await request(app.getHttpServer())
-        .delete(`/attendee-events/${attendeeEventId}`)
-        .expect(200);
-
-      expect(response.body.id).toBe(attendeeEventId);
-
-      // Verify deletion
-      await request(app.getHttpServer())
-        .get(`/attendee-events/${attendeeEventId}`)
-        .expect(404);
-    });
-
-    it('/tickets/:id (DELETE) - should delete ticket', async () => {
-      const response = await request(app.getHttpServer())
-        .delete(`/tickets/${ticketId}`)
-        .expect(200);
-
-      expect(response.body.id).toBe(ticketId);
-
-      // Verify deletion
-      await request(app.getHttpServer())
-        .get(`/tickets/${ticketId}`)
-        .expect(404);
-    });
-
-    it('/events/:id (DELETE) - should delete event', async () => {
-      const response = await request(app.getHttpServer())
-        .delete(`/events/${eventId}`)
-        .expect(200);
-
-      expect(response.body.id).toBe(eventId);
-
-      // Verify deletion
-      await request(app.getHttpServer()).get(`/events/${eventId}`).expect(404);
-    });
-
-    it('/attendees/:id (DELETE) - should delete attendee', async () => {
-      const response = await request(app.getHttpServer())
-        .delete(`/attendees/${attendeeId}`)
-        .expect(200);
-
-      expect(response.body.id).toBe(attendeeId);
-
-      // Verify deletion
-      await request(app.getHttpServer())
-        .get(`/attendees/${attendeeId}`)
-        .expect(404);
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should return 404 for non-existent attendee', async () => {
-      await request(app.getHttpServer())
-        .get('/attendees/123e4567-e89b-12d3-a456-426614174999')
-        .expect(404);
-    });
-
-    it('should return 400 for invalid UUID', async () => {
-      await request(app.getHttpServer())
-        .get('/attendees/invalid-uuid')
-        .expect(400);
-    });
-
-    it('should return 404 for non-existent endpoint', async () => {
-      await request(app.getHttpServer()).get('/non-existent-route').expect(404);
+      it('should return 404 for non-existent endpoint', async () => {
+        await request(app.getHttpServer())
+          .get('/non-existent-route')
+          .expect(404);
+      });
     });
   });
 });
