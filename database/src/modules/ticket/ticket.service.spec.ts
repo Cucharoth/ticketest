@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { TicketService } from './ticket.service';
 
 describe('TicketService', () => {
   let service: TicketService;
