@@ -1,4 +1,5 @@
 import { validate } from 'class-validator';
+import { UpdateNotificationDto } from './update-notification.dto';
 
 describe('UpdateNotificationDto', () => {
   let dto: UpdateNotificationDto;
