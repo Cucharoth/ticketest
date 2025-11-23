@@ -1,4 +1,5 @@
 import { validate } from 'class-validator';
+import { CreateTicketDto } from './create-ticket.dto';
 
 describe('CreateTicketDto', () => {
   let dto: CreateTicketDto;
