@@ -128,7 +128,7 @@ describe('Main Bootstrap', () => {
 
       await bootstrap();
 
-      expect(mockApp.listen).toHaveBeenCalledWith(4000, '127.0.0.1');
+      expect(mockApp.listen).toHaveBeenCalledWith(4000, '0.0.0.0');
     });
 
     it('should listen on default port 3000 if PORT is not set', async () => {
@@ -136,15 +136,15 @@ describe('Main Bootstrap', () => {
 
       await bootstrap();
 
-      expect(mockApp.listen).toHaveBeenCalledWith(3000, '127.0.0.1');
+      expect(mockApp.listen).toHaveBeenCalledWith(3000, '0.0.0.0');
     });
 
-    it('should listen on localhost (127.0.0.1)', async () => {
+    it('should listen on localhost (0.0.0.0)', async () => {
       await bootstrap();
 
       expect(mockApp.listen).toHaveBeenCalledWith(
         expect.any(Number),
-        '127.0.0.1',
+        '0.0.0.0',
       );
     });
 
@@ -250,7 +250,7 @@ describe('Main Bootstrap', () => {
       await bootstrap();
 
       expect(NestFactory.create).toHaveBeenCalled();
-      expect(mockApp.listen).toHaveBeenCalledWith(8080, '127.0.0.1');
+      expect(mockApp.listen).toHaveBeenCalledWith(8080, '0.0.0.0');
     });
 
     it('should handle string PORT environment variable', async () => {
@@ -258,7 +258,7 @@ describe('Main Bootstrap', () => {
 
       await bootstrap();
 
-      expect(mockApp.listen).toHaveBeenCalledWith(9000, '127.0.0.1');
+      expect(mockApp.listen).toHaveBeenCalledWith(9000, '0.0.0.0');
     });
 
     it('should handle PORT as undefined', async () => {
@@ -266,7 +266,7 @@ describe('Main Bootstrap', () => {
 
       await bootstrap();
 
-      expect(mockApp.listen).toHaveBeenCalledWith(3000, '127.0.0.1');
+      expect(mockApp.listen).toHaveBeenCalledWith(3000, '0.0.0.0');
     });
 
     it('should parse PORT as number', async () => {
@@ -274,7 +274,7 @@ describe('Main Bootstrap', () => {
 
       await bootstrap();
 
-      expect(mockApp.listen).toHaveBeenCalledWith(7777, '127.0.0.1');
+      expect(mockApp.listen).toHaveBeenCalledWith(7777, '0.0.0.0');
       expect(mockLogger.log).toHaveBeenCalledWith(
         'Server is running on http://localhost:7777',
       );

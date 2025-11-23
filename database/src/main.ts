@@ -23,7 +23,7 @@ export async function bootstrap() {
   app.enableShutdownHooks();
 
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-  await app.listen(port, '127.0.0.1');
+  await app.listen(port, '0.0.0.0');
 
   logger.log(`Server is running on http://localhost:${port}`);
 
