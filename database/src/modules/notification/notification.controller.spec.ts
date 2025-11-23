@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotificationController } from './notification.controller';
+import { NotificationService } from './notification.service';
 
 describe('NotificationController', () => {
+  let controller: NotificationController;
   const mockNotification = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     message: 'Your ticket has been confirmed',
