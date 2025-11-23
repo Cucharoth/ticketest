@@ -137,6 +137,46 @@ describe('AttendeeEventService', () => {
     });
   });
 
+  describe('findAllByEventIdAndAttendeeId', () => {
+    it('should return attendee-events for given event and attendee', async () => {
+      const items = [mockAttendeeEvent];
+      mockPrismaService.attendeeEvent.findMany.mockResolvedValue(items);
+
+      const result = await service.findAllByEventIdAndAttendeeId(
+        mockAttendeeEvent.eventId,
+        mockAttendeeEvent.attendeeId,
+      );
+
+      expect(result).toEqual(items);
+      expect(mockPrismaService.attendeeEvent.findMany).toHaveBeenCalledWith({
+        where: {
+          attendeeId: mockAttendeeEvent.attendeeId,
+          eventId: mockAttendeeEvent.eventId,
+        },
+      });
+    });
+
+    it('should throw NotFoundException when none found', async () => {
+      mockPrismaService.attendeeEvent.findMany.mockResolvedValue([]);
+
+      await expect(
+        service.findAllByEventIdAndAttendeeId(
+          mockAttendeeEvent.eventId,
+          mockAttendeeEvent.attendeeId,
+        ),
+      ).rejects.toThrow(NotFoundException);
+
+      await expect(
+        service.findAllByEventIdAndAttendeeId(
+          mockAttendeeEvent.eventId,
+          mockAttendeeEvent.attendeeId,
+        ),
+      ).rejects.toThrow(
+        `No events found for Attendee with ID ${mockAttendeeEvent.attendeeId}`,
+      );
+    });
+  });
+
   describe('findOne', () => {
     it('should return attendee-event with relations', async () => {
       mockPrismaService.attendeeEvent.findUnique.mockResolvedValue(
