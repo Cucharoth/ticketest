@@ -8,6 +8,7 @@ import { AttendeeEvent } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { CreateAttendeeEventDto } from './dto/create-attendee-event.dto';
 import { UpdateAttendeeEventDto } from './dto/update-attendee-event.dto';
+import { ConfirmAttendeeDto } from './dto/confirm-attendee.dto';
 
 @Injectable()
 export class AttendeeEventService {
@@ -107,5 +108,25 @@ export class AttendeeEventService {
     return this.prisma.attendeeEvent.delete({
       where: { id },
     });
+  }
+
+  async confirm(id: string, confirmDto: ConfirmAttendeeDto): Promise<AttendeeEvent> {
+    await this.findOne(id);
+
+    try {
+      return await this.prisma.attendeeEvent.update({
+        where: { id },
+        data: {
+          confirmed: confirmDto.confirmed,
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2003') {
+          throw new ConflictException('Invalid attendeeId or eventId');
+        }
+      }
+      throw error;
+    }
   }
 }
