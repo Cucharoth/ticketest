@@ -11,28 +11,32 @@ describe('AttendeeController (e2e)', () => {
 
   const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:3000';
 
-  beforeAll(async () => {
-    // 1. Create a Test Event Type and Event in the Database Module directly
-    try {
-      // Create Event Type
-      const typeResponse = await axios.post(`${dbServiceUrl}/event-types`, {
-        name: 'Integration Test Type',
-      });
-      const typeId = typeResponse.data.id;
+  jest.setTimeout(30000)
 
-      // Create Event
-      const eventResponse = await axios.post(`${dbServiceUrl}/events`, {
-        name: 'Integration Test Event',
-        date: new Date().toISOString(),
-        place: 'Test Place',
-        ticketMax: 100,
-        ticketsLeft: 100,
-        ticketSold: 0,
-        typeId: typeId,
-      });
-      eventId = eventResponse.data.id;
+  beforeAll(async () => {
+    // 1. Query existing Event Types and Events from the Database Module
+    try {
+      // Get existing event types
+      const typesResponse = await axios.get(`${dbServiceUrl}/event-types`);
+      const eventTypes = typesResponse.data;
+      
+      if (!eventTypes || eventTypes.length === 0) {
+        throw new Error('No event types found in database. Please run seed data.');
+      }
+      
+      const typeId = eventTypes[0].id; // Use the first event type
+
+      // Get existing events
+      const eventsResponse = await axios.get(`${dbServiceUrl}/events`);
+      const events = eventsResponse.data;
+      
+      if (!events || events.length === 0) {
+        throw new Error('No events found in database. Please run seed data.');
+      }
+      
+      eventId = events[0].id; // Use the first event
     } catch (error) {
-      console.error('Error setting up test data:', error.response?.data || error.message);
+      console.error('Error fetching test data:', error.response?.data || error.message);
       throw error;
     }
 
@@ -45,7 +49,14 @@ describe('AttendeeController (e2e)', () => {
   });
 
   afterAll(async () => {
-    // Cleanup if possible, or just close app
+    // Cleanup: delete the created attendee (cascade will handle related records)
+    if (attendeeId) {
+      try {
+        await axios.delete(`${dbServiceUrl}/attendees/${attendeeId}`);
+      } catch (error) {
+        console.error('Error cleaning up attendee:', error.response?.data || error.message);
+      }
+    }
     await app.close();
   });
 

@@ -7,15 +7,15 @@
 
 
 -- Clean existing data
-DELETE FROM "attendee_event";
-DELETE FROM "ticket_event";
-DELETE FROM "ticket";
-DELETE FROM "event";
-DELETE FROM "attendee";
-DELETE FROM "notification";
-DELETE FROM "event_type";
-DELETE FROM "ticket_type";
-DELETE FROM "notification_type";
+TRUNCATE TABLE "attendee_event";
+TRUNCATE TABLE "ticket_event";
+TRUNCATE TABLE "ticket";
+TRUNCATE TABLE "event";
+TRUNCATE TABLE "attendee";
+TRUNCATE TABLE "notification";
+TRUNCATE TABLE "event_type";
+TRUNCATE TABLE "ticket_type";
+TRUNCATE TABLE "notification_type";
 
 -- =====================================================
 -- Event Types

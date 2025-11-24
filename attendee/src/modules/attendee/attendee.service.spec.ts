@@ -23,7 +23,11 @@ describe('AttendeeService', () => {
     };
 
     mockConfigService = {
-      get: jest.fn().mockReturnValue('http://localhost:3000'),
+      get: jest.fn((key: string) => {
+        if (key === 'env.dbServiceUrl') return 'http://localhost:3000';
+        if (key === 'env.notificationServiceUrl') return 'http://localhost:33205';
+        return undefined;
+      }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -55,16 +59,22 @@ describe('AttendeeService', () => {
 
       mockHttpService.post
         .mockReturnValueOnce(of({ data: attendeeResponse })) // Create attendee
+        .mockReturnValueOnce(of({ data: { status: 'sent' } })) // Send notification
         .mockReturnValueOnce(of({ data: { ...attendeeResponse, eventId: 'event-uuid' } })); // Link event
 
       const result = await service.create(dto);
 
       expect(result).toEqual(attendeeResponse);
-      expect(httpService.post).toHaveBeenCalledTimes(2);
+      expect(httpService.post).toHaveBeenCalledTimes(3); // attendee + notification + event link
       expect(httpService.post).toHaveBeenCalledWith('http://localhost:3000/attendees', {
         name: dto.name,
         email: dto.email,
         cellphone: dto.cellphone,
+      });
+      expect(httpService.post).toHaveBeenCalledWith('http://localhost:33205/api/notifications/send', {
+        attendee_id: 'attendee-uuid',
+        message: expect.stringContaining('Bienvenido'),
+        type: '30000000-0000-0000-0000-000000000001',
       });
       expect(httpService.post).toHaveBeenCalledWith('http://localhost:3000/attendee-events', {
         attendeeId: 'attendee-uuid',

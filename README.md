@@ -45,57 +45,67 @@ npm run test:e2e
 
 Resumen: levanta Docker en `database/`, luego desde la raíz instala dependencias, genera Prisma, aplica migraciones y corre tests. Esto te deja listo para desarrollar y validar la app.
 
-## Tech Stack
+C4 - NIVEL 1
 
-- **Ticket Management (Gestión de Entradas)**: Go (Golang)
-- **Assistant Management (Gestión de Asistentes)**: NestJS (Node.js/TypeScript)
-- **Notifications (Notificaciones)**: FastAPI (Python)
-- **Database Module (Gestión DB)**: NestJS (Node.js/TypeScript)
-- **Database**: PostgreSQL
-- **Frontend**: None (No frontend)
+![C4-2](./docs/C4-TICKETEST-C4%20-%20Contexto.png)
 
-## Functional Requirements (FR)
+C4 - NIVEL 2
+![C4-1](./docs/C4-TICKETEST-C4%20-%20Contenedores.png)
+
+
+
+
+## Stack Tecnológico
+
+- **Gestión de Entradas (Ticket Management)**: Go (Golang)
+- **Gestión de Asistentes (Assistant Management)**: NestJS (Node.js/TypeScript)
+- **Notificaciones (Notifications)**: FastAPI (Python)
+- **Módulo de Base de Datos (Database Module)**: NestJS (Node.js/TypeScript)
+- **Base de Datos**: PostgreSQL
+- **Frontend**: Ninguno (No frontend)
+
+## Requerimientos Funcionales (RF)
 
 ### Gestión de Entradas
-- Consult availability of ticket types (Read from DB Module).
-- Register ticket purchase.
-- Verify availability before purchase.
-- Reduce available quantity and increase sold quantity upon confirmation.
-- Admin: Update ticket info (price, total quantity).
+- Consultar disponibilidad de tipos de entradas (Leer del Módulo DB).
+- Registrar compra de entrada.
+- Verificar disponibilidad antes de la compra.
+- Reducir cantidad disponible e incrementar cantidad vendida tras confirmación.
+- Admin: Actualizar información de entradas (precio, cantidad total).
 
-### Gestión de Asistentes (Attendees)
-- **FR-AST-001**: Register new attendee (Create in DB Module).
-- **FR-AST-002**: Confirm attendee assistance (Update in DB Module).
-- **FR-AST-003**: Cancel attendee registration (Update/Delete in DB Module).
-- **FR-AST-004**: Admin: Consult list of attendees per event (Read from DB Module).
+### Gestión de Asistentes
+- **FR-AST-001**: Registrar nuevo asistente (Crear en Módulo DB).
+- **FR-AST-002**: Confirmar asistencia de asistente (Actualizar en Módulo DB).
+- **FR-AST-003**: Cancelar registro de asistente (Actualizar/Eliminar en Módulo DB).
+- **FR-AST-004**: Admin: Consultar lista de asistentes por evento (Leer del Módulo DB).
 
 ### Notificaciones
-- **FR-NOT-001**: Send notifications to one or more recipients (Email/SMS).
-- **FR-NOT-002**: Get recipient data (email, phone) from DB Module.
-- **FR-NOT-003**: Register sent notification in history (Create in DB Module).
-- **FR-NOT-004**: Admin: Consult notification history (Read from DB Module).
+- **FR-NOT-001**: Enviar notificaciones a uno o más destinatarios (Email/SMS).
+- **FR-NOT-002**: Obtener datos del destinatario (email, teléfono) del Módulo DB.
+- **FR-NOT-003**: Registrar notificación enviada en el historial (Crear en Módulo DB).
+- **FR-NOT-004**: Admin: Consultar historial de notificaciones (Leer del Módulo DB).
 
-## Overall Endpoints
+## Endpoints Generales
 
-### For Notification Service
-- `GET /attendees/{id}`: Retrieve attendee details (email, phone). ID is UUID.
-- `POST /notifications`: Create a notification history record.
-- `GET /notifications`: Retrieve notification history.
+### Para Servicio de Notificaciones
+- `GET /attendees/{id}`: Recuperar detalles del asistente (email, teléfono). ID es UUID.
+- `POST /notifications`: Crear un registro de historial de notificación.
+- `GET /notifications`: Recuperar historial de notificaciones.
 
-### For Ticket Service
-- `GET /events/{id}`: Get event/ticket availability.
-- `PUT /events/{id}`: Update ticket quantity/sold count.
+### Para Servicio de Tickets
+- `GET /events/{id}`: Obtener disponibilidad de evento/entrada.
+- `PUT /events/{id}`: Actualizar cantidad de entradas/conteo de vendidos.
 
-### For Assistant Service (Attendee Service)
-- `POST /attendee-events`: Create a new attendee and link to event.
-- `PATCH /attendee-events/{id}`: Update attendee details.
-- `GET /attendee-events`: List all attendees.
-- `GET /attendee-events/{id}`: Get attendee details.
-- `DELETE /attendee-events/{id}`: Remove attendee.
-- `POST /attendee-events/confirm`: Confirm attendee for an event.
-- `GET /attendee-events/events/{id}`: List all attendees for a specific event.
+### Para Servicio de Asistentes (Attendee Service)
+- `POST /attendee-events`: Crear un nuevo asistente y vincular a evento.
+- `PATCH /attendee-events/{id}`: Actualizar detalles del asistente.
+- `GET /attendee-events`: Listar todos los asistentes.
+- `GET /attendee-events/{id}`: Obtener detalles del asistente.
+- `DELETE /attendee-events/{id}`: Eliminar asistente.
+- `POST /attendee-events/confirm`: Confirmar asistente para un evento.
+- `GET /attendee-events/events/{id}`: Listar todos los asistentes para un evento específico.
 
-## Use Cases (UC)
+## Casos de Uso (CU)
 
 - Consultar Disponibilidad de Entradas
 - Registrar Compra de Entrada
@@ -106,42 +116,42 @@ Resumen: levanta Docker en `database/`, luego desde la raíz instala dependencia
 - Enviar Notificación
 - Consultar Historial de Notificaciones
 
-## Test Suite
+## Suite de Pruebas
 
 ### Módulo de Gestión de Entradas (TKT)
-- **TKT-INT-01**: Consult existing ticket → Call DB (GET /events/{id}) → Return quantity.
-- **TKT-INT-02**: Consult non-existing ticket → Handle 404 from DB → Return "Not found".
-- **TKT-INT-03**: Buy 2 tickets (Happy Path) → Verify availability → Update DB (PUT /events/{id}).
-- **TKT-INT-04**: Buy tickets (Insufficient Stock) → Verify availability → Return "Insufficient stock".
-- **TKT-INT-05**: Update price → Call DB (PUT /events/{id}).
-- **TKT-INT-06**: Increase total quantity → Call DB (PUT /events/{id}).
+- **TKT-INT-01**: Consultar entrada existente → Llamar DB (GET /events/{id}) → Retornar cantidad.
+- **TKT-INT-02**: Consultar entrada no existente → Manejar 404 de DB → Retornar "No encontrado".
+- **TKT-INT-03**: Comprar 2 entradas (Happy Path) → Verificar disponibilidad → Actualizar DB (PUT /events/{id}).
+- **TKT-INT-04**: Comprar entradas (Stock Insuficiente) → Verificar disponibilidad → Retornar "Stock insuficiente".
+- **TKT-INT-05**: Actualizar precio → Llamar DB (PUT /events/{id}).
+- **TKT-INT-06**: Incrementar cantidad total → Llamar DB (PUT /events/{id}).
 
 ### Módulo de Gestión de Asistentes (AST)
-- **AST-INT-01**: Register assistant (Happy Path) → Call DB (POST /attendee-events) → Status "no confirmado".
-- **AST-INT-02**: Register duplicate assistant → Handle 409 from DB → Return error.
-- **AST-INT-03**: Confirm assistance → Call DB (POST /attendee-events/confirm) → Status "confirmado".
-- **AST-INT-04**: Confirm non-existing assistant → Handle 404 from DB.
-- **AST-INT-05**: List assistants → Call DB (GET /attendee-events).
-- **AST-INT-06**: List assistants by event → Call DB (GET /attendee-events/events/{id}).
+- **AST-INT-01**: Registrar asistente (Happy Path) → Llamar DB (POST /attendee-events) → Estado "no confirmado".
+- **AST-INT-02**: Registrar asistente duplicado → Manejar 409 de DB → Retornar error.
+- **AST-INT-03**: Confirmar asistencia → Llamar DB (POST /attendee-events/confirm) → Estado "confirmado".
+- **AST-INT-04**: Confirmar asistente no existente → Manejar 404 de DB.
+- **AST-INT-05**: Listar asistentes → Llamar DB (GET /attendee-events).
+- **AST-INT-06**: Listar asistentes por evento → Llamar DB (GET /attendee-events/events/{id}).
 
 ### Módulo de Notificaciones (NOT)
-- **NOT-INT-01**: Send notification (Happy Path) → Get email (GET /attendees/{id}) → Simulate send → Register history (POST /notifications).
-- **NOT-INT-02**: Send to non-existing assistant → Handle 404 from DB → Return "Recipient not found".
-- **NOT-INT-03**: Consult history → Call DB (GET /notifications).
+- **NOT-INT-01**: Enviar notificación (Happy Path) → Obtener email (GET /attendees/{id}) → Simular envío → Registrar historial (POST /notifications).
+- **NOT-INT-02**: Enviar a asistente no existente → Manejar 404 de DB → Retornar "Destinatario no encontrado".
+- **NOT-INT-03**: Consultar historial → Llamar DB (GET /notifications).
 
 ### Módulo de Base de Datos (DB)
-- **DB-INT-01**: Create attendee → POST /attendees → Return created attendee with UUID.
-- **DB-INT-02**: Create duplicate attendee → POST /attendees with existing email → Handle unique constraint error.
-- **DB-INT-03**: Create attendee-event association → POST /attendee-events → Link attendee to event.
-- **DB-INT-04**: Confirm attendee-event → POST /attendee-events/confirm/{id} → Update confirmed status.
-- **DB-INT-05**: Get attendees by event → GET /attendee-events/events/{id} → Return list of attendees.
-- **DB-INT-06**: Create notification → POST /notifications → Log notification in database.
-- **DB-INT-07**: Get notification history → GET /notifications → Return all notifications.
-- **DB-INT-08**: Create event type → POST /event-types → Return created event type.
-- **DB-INT-09**: Create event → POST /events → Return created event with type association.
+- **DB-INT-01**: Crear asistente → POST /attendees → Retornar asistente creado con UUID.
+- **DB-INT-02**: Crear asistente duplicado → POST /attendees con email existente → Manejar error de restricción única.
+- **DB-INT-03**: Crear asociación asistente-evento → POST /attendee-events → Vincular asistente a evento.
+- **DB-INT-04**: Confirmar asistente-evento → POST /attendee-events/confirm/{id} → Actualizar estado confirmado.
+- **DB-INT-05**: Obtener asistentes por evento → GET /attendee-events/events/{id} → Retornar lista de asistentes.
+- **DB-INT-06**: Crear notificación → POST /notifications → Registrar notificación en base de datos.
+- **DB-INT-07**: Obtener historial de notificaciones → GET /notifications → Retornar todas las notificaciones.
+- **DB-INT-08**: Crear tipo de evento → POST /event-types → Retornar tipo de evento creado.
+- **DB-INT-09**: Crear evento → POST /events → Retornar evento creado con asociación de tipo.
 
-### Smoke Tests (Connectivity)
+### Smoke Tests (Conectividad)
 - **HUMO-01 (TKT → DB)**: GET /events/availability → 200 OK.
 - **HUMO-02 (AST → DB)**: GET /attendee-events → 200 OK.
 - **HUMO-03 (NOT → DB)**: GET /notifications/history → 200 OK.
-- **HUMO-04 (AST → NOT)**: POST /attendee-events → 201 Created → Check NOT logs for send request.
+- **HUMO-04 (AST → NOT)**: POST /attendee-events → 201 Created → Verificar logs de NOT para solicitud de envío.

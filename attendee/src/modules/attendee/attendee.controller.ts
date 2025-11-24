@@ -11,44 +11,44 @@ export class AttendeeController {
   constructor(private readonly attendeeService: AttendeeService) {}
 
   @Post()
-  create(@Body() createAttendeeEventDto: CreateAttendeeEventDto) {
+  async create(@Body() createAttendeeEventDto: CreateAttendeeEventDto) {
     this.logger.log(`Attendee Controller create Called: ${JSON.stringify(createAttendeeEventDto)}`);
-    return this.attendeeService.create(createAttendeeEventDto);
+    return await this.attendeeService.create(createAttendeeEventDto);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     this.logger.log(`Attendee Controller findAll Called`);
-    return this.attendeeService.findAll();
+    return await this.attendeeService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     this.logger.log(`Attendee-Event Controller findOne Called: ${JSON.stringify(id)}`);
-    return this.attendeeService.findOne(id);
+    return await this.attendeeService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAttendeeDto: UpdateAttendeeDto) {
+  async update(@Param('id') id: string, @Body() updateAttendeeDto: UpdateAttendeeDto) {
     this.logger.log(`Attendee Controller update Called: ${JSON.stringify(id)}`);
-    return this.attendeeService.update(id, updateAttendeeDto);
+    return await this.attendeeService.update(id, updateAttendeeDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     this.logger.log(`Attendee Controller remove Called: ${JSON.stringify(id)}`);
-    return this.attendeeService.remove(id);
+    return await this.attendeeService.remove(id);
   }
 
   @Post('confirm')
-  confirm(@Body() confirmAttendeeDto: ConfirmAttendeeDto) {
+  async confirm(@Body() confirmAttendeeDto: ConfirmAttendeeDto) {
     this.logger.log(`Attendee Controller confirm Called: ${JSON.stringify(confirmAttendeeDto)}`);
-    return this.attendeeService.confirm(confirmAttendeeDto);
+    return await this.attendeeService.confirm(confirmAttendeeDto);
   }
 
   @Get('events/:id')
-  findAllByEvent(@Param('id') id: string) {
+  async findAllByEvent(@Param('id') id: string) {
     this.logger.log(`Attendee-Event Controller findAllByEvent Called: ${JSON.stringify(id)}`);
-    return this.attendeeService.findAllByEvent(id);
+    return await this.attendeeService.findAllByEvent(id);
   }
 }

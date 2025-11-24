@@ -9,7 +9,7 @@ npm run test
 
 **Integration Tests:**
 ```bash
-npm run test:e2e
+npm run test:e2e -- integration.e2e-spec.ts
 ```
 
 **Smoke Tests:**

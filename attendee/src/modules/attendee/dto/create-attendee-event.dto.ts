@@ -22,5 +22,5 @@ export class CreateAttendeeEventDto {
 
   @IsOptional()
   @IsBoolean()
-  confirmed: boolean;
+  confirmed?: boolean;
 }
