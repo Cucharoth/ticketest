@@ -1,5 +1,10 @@
 # ticketest
-Mock Massive Event Management System designed with a microservice architecture for scalability, with an emphasis in a full testing suit.
+Mock Massive Event Management System designed with a microservice architecture for scalability, with an emphasis in a full testing suit.  
+
+## Integrantes
+- Eduardo Arevalo 
+- Cedric Kirmayr
+
 ## Módulos principales
 
 - `database/`: Contiene la configuración de Docker Compose para PostgreSQL, scripts de inicialización (`db/init.sql`), y la configuración de Prisma (`schema.prisma`, `.env`). Aquí se levantan la base de datos y se aplican seeds/migrations.
