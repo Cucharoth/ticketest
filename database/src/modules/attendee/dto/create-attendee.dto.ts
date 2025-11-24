@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
 export class CreateAttendeeDto {
   @IsNotEmpty()
@@ -15,4 +15,8 @@ export class CreateAttendeeDto {
     message: 'Cellphone must be a valid phone number',
   })
   cellphone: string;
+
+  @IsBoolean()
+  @IsOptional()
+  confirmed?: boolean;
 }
