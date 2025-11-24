@@ -8,6 +8,8 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AttendeeEventService } from './attendee-event.service';
 import { CreateAttendeeEventDto } from './dto/create-attendee-event.dto';
@@ -68,10 +70,21 @@ export class AttendeeEventController {
 
   @Post('confirm/:id')
   @HttpCode(200)
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  )
   async confirm(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: ConfirmAttendeeDto,
   ): Promise<AttendeeEvent> {
     return await this.attendeeEventService.confirm(id, dto);
+  }
+
+  @Get('events/:id')
+  findAllByEvent(@Param('id') id: string) {
+    return this.attendeeEventService.findAllByEvent(id);
   }
 }

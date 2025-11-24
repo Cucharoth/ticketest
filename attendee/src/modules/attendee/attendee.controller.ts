@@ -5,7 +5,7 @@ import { UpdateAttendeeDto } from './dto/update-attendee.dto';
 import { Logger } from '@nestjs/common';
 import { ConfirmAttendeeDto } from './dto/confirm-attendee.dto';
 
-@Controller('attendees')
+@Controller('attendee-events')
 export class AttendeeController {
   private readonly logger = new Logger(AttendeeController.name);
   constructor(private readonly attendeeService: AttendeeService) {}
@@ -24,7 +24,7 @@ export class AttendeeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    this.logger.log(`Attendee Controller findOne Called: ${JSON.stringify(id)}`);
+    this.logger.log(`Attendee-Event Controller findOne Called: ${JSON.stringify(id)}`);
     return this.attendeeService.findOne(id);
   }
 
@@ -44,5 +44,11 @@ export class AttendeeController {
   confirm(@Body() confirmAttendeeDto: ConfirmAttendeeDto) {
     this.logger.log(`Attendee Controller confirm Called: ${JSON.stringify(confirmAttendeeDto)}`);
     return this.attendeeService.confirm(confirmAttendeeDto);
+  }
+
+  @Get('events/:id')
+  findAllByEvent(@Param('id') id: string) {
+    this.logger.log(`Attendee-Event Controller findAllByEvent Called: ${JSON.stringify(id)}`);
+    return this.attendeeService.findAllByEvent(id);
   }
 }
