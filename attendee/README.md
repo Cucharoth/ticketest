@@ -8,11 +8,13 @@ npm run test
 
 ### ENDPOINT
 
-`POST /attendees`
-`GET /attendees`
-`GET /attendees/:id`
-`PATCH /attendees/:id`
-`DELETE /attendees/:id`
+`POST /attendee-events`
+`GET /attendee-events`
+`GET /attendee-events/:id`
+`PATCH /attendee-events/:id`
+`DELETE /attendee-events/:id`
+`POST /attendee-events/confirm`
+`GET /attendee-events/events/:id`
 
 
 ### install dependencies

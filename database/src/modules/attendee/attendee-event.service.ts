@@ -38,6 +38,10 @@ export class AttendeeEventService {
       orderBy: {
         createdAt: 'desc',
       },
+      include: {
+        event: true,
+        attendee: true,
+      },
     });
   }
 
@@ -111,11 +115,22 @@ export class AttendeeEventService {
   }
 
   async confirm(id: string, confirmDto: ConfirmAttendeeDto): Promise<AttendeeEvent> {
-    await this.findOne(id);
+    const attendeeEvent = await this.prisma.attendeeEvent.findFirst({
+      where: {
+        eventId: confirmDto.eventId,
+        attendeeId: confirmDto.attendeeId,
+      },
+    });
+
+    if (!attendeeEvent) {
+      throw new NotFoundException(
+        `AttendeeEvent not found for event ${confirmDto.eventId} and attendee ${confirmDto.attendeeId}`,
+      );
+    }
 
     try {
       return await this.prisma.attendeeEvent.update({
-        where: { id },
+        where: { id: attendeeEvent.id },
         data: {
           confirmed: confirmDto.confirmed,
         },
@@ -128,5 +143,15 @@ export class AttendeeEventService {
       }
       throw error;
     }
+  }
+  
+  async findAllByEvent(id: string): Promise<AttendeeEvent[]> {
+    return this.prisma.attendeeEvent.findMany({
+      where: { eventId: id },
+      include: {
+        event: true,
+        attendee: true,
+      },
+    });
   }
 }

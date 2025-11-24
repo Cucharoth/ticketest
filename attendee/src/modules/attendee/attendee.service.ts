@@ -20,8 +20,8 @@ export class AttendeeService {
   }
 
   async create(createAttendeeEventDto: CreateAttendeeEventDto) {
-    this.logger.log(`Creating Attendee name: ${createAttendeeEventDto.name}`);
     try {
+      this.logger.log(`Creating Attendee name: ${createAttendeeEventDto.name}`);
       // 1. Create Attendee
       const { data: attendee } = await firstValueFrom(
         this.httpService.post(`${this.dbServiceUrl}/attendees`, {
@@ -31,6 +31,7 @@ export class AttendeeService {
         }),
       );
 
+      this.logger.log(`Attendee created: ${attendee.id}`);
       // 2. Link to Event
       if (createAttendeeEventDto.eventId) {
         await firstValueFrom(
@@ -48,10 +49,10 @@ export class AttendeeService {
   }
 
   async findAll() {
-    this.logger.log(`Finding all Attendees`);
+    this.logger.log(`Finding all Attendee-Events`);
     try {
       const { data } = await firstValueFrom(
-        this.httpService.get(`${this.dbServiceUrl}/attendees`),
+        this.httpService.get(`${this.dbServiceUrl}/attendee-events`),
       );
       return data;
     } catch (error) {
@@ -60,10 +61,10 @@ export class AttendeeService {
   }
 
   async findOne(id: string) {
-    this.logger.log(`Finding Attendee by id: ${id}`);
+    this.logger.log(`Finding Attendee-Event by id: ${id}`);
     try {
       const { data } = await firstValueFrom(
-        this.httpService.get(`${this.dbServiceUrl}/attendees/${id}`),
+        this.httpService.get(`${this.dbServiceUrl}/attendee-events/${id}`),
       );
       return data;
     } catch (error) {
@@ -99,7 +100,19 @@ export class AttendeeService {
     this.logger.log(`Confirming Attendee by id: ${confirmAttendeeDto.attendeeId}`);
     try {
       const { data } = await firstValueFrom(
-        this.httpService.patch(`${this.dbServiceUrl}/attendees-events/confirm/${confirmAttendeeDto.attendeeId}`, confirmAttendeeDto),
+        this.httpService.post(`${this.dbServiceUrl}/attendee-events/confirm/${confirmAttendeeDto.attendeeId}`, confirmAttendeeDto),
+      );
+      return data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async findAllByEvent(id: string) {
+    this.logger.log(`Finding all Attendee-Events by event id: ${id}`);
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get(`${this.dbServiceUrl}/attendee-events/events/${id}`),
       );
       return data;
     } catch (error) {
