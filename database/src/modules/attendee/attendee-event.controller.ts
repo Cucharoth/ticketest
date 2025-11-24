@@ -13,6 +13,7 @@ import { AttendeeEventService } from './attendee-event.service';
 import { CreateAttendeeEventDto } from './dto/create-attendee-event.dto';
 import { UpdateAttendeeEventDto } from './dto/update-attendee-event.dto';
 import { AttendeeEvent } from '@prisma/client';
+import { ConfirmAttendeeDto } from './dto/confirm-attendee.dto';
 
 @Controller('attendee-events')
 export class AttendeeEventController {
@@ -51,5 +52,14 @@ export class AttendeeEventController {
   @HttpCode(200)
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<AttendeeEvent> {
     return await this.attendeeEventService.remove(id);
+  }
+
+  @Post('confirm/:id')
+  @HttpCode(200)
+  async confirm(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: ConfirmAttendeeDto,
+  ): Promise<AttendeeEvent> {
+    return await this.attendeeEventService.confirm(id, dto);
   }
 }

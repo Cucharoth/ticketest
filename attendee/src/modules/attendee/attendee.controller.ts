@@ -3,6 +3,7 @@ import { AttendeeService } from './attendee.service';
 import { CreateAttendeeEventDto } from './dto/create-attendee-event.dto';
 import { UpdateAttendeeDto } from './dto/update-attendee.dto';
 import { Logger } from '@nestjs/common';
+import { ConfirmAttendeeDto } from './dto/confirm-attendee.dto';
 
 @Controller('attendees')
 export class AttendeeController {
@@ -37,5 +38,11 @@ export class AttendeeController {
   remove(@Param('id') id: string) {
     this.logger.log(`Attendee Controller remove Called: ${JSON.stringify(id)}`);
     return this.attendeeService.remove(id);
+  }
+
+  @Post('confirm')
+  confirm(@Body() confirmAttendeeDto: ConfirmAttendeeDto) {
+    this.logger.log(`Attendee Controller confirm Called: ${JSON.stringify(confirmAttendeeDto)}`);
+    return this.attendeeService.confirm(confirmAttendeeDto);
   }
 }

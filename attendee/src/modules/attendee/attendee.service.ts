@@ -5,6 +5,7 @@ import { UpdateAttendeeDto } from './dto/update-attendee.dto';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { ConfirmAttendeeDto } from './dto/confirm-attendee.dto';
 
 @Injectable()
 export class AttendeeService {
@@ -87,6 +88,18 @@ export class AttendeeService {
     try {
       const { data } = await firstValueFrom(
         this.httpService.delete(`${this.dbServiceUrl}/attendees/${id}`),
+      );
+      return data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async confirm(confirmAttendeeDto: ConfirmAttendeeDto) {
+    this.logger.log(`Confirming Attendee by id: ${confirmAttendeeDto.attendeeId}`);
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.patch(`${this.dbServiceUrl}/attendees-events/confirm/${confirmAttendeeDto.attendeeId}`, confirmAttendeeDto),
       );
       return data;
     } catch (error) {
