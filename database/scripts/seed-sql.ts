@@ -4,9 +4,32 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl || typeof dbUrl !== 'string' || dbUrl.trim() === '') {
+  console.error(
+    'DATABASE_URL environment variable is not set or is invalid.\n' +
+      'Expected a PostgreSQL connection string, for example:\n' +
+      '  postgresql://username:password@127.0.0.1:5432/my_database\n' +
+      'Please set DATABASE_URL and try again.',
+  );
+  process.exit(1);
+}
+
+// Quick sanity check for common mistakes (not exhaustive)
+// Match strings starting with 'postgres://' or 'postgresql://'
+if (!/^postgres(?:ql)?:\/\//i.test(dbUrl)) {
+  console.warn(
+    'DATABASE_URL does not look like a postgres URL. Continuing but this may fail.\n' +
+      'Value: ' +
+      dbUrl,
+  );
+}
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: dbUrl,
 });
 const adapter = new PrismaPg(pool);
 
@@ -85,7 +108,7 @@ async function runSqlFile() {
 
       try {
         // Extract table name for better logging
-        const tableMatch = statement.match(/INSERT INTO (\w+)/i);
+        const tableMatch = statement.match(/INSERT INTO (\"?\w+\"?)/i);
         const tableName = tableMatch ? tableMatch[1] : 'unknown';
 
         console.log(
@@ -108,6 +131,7 @@ async function runSqlFile() {
     throw error;
   } finally {
     await prisma.$disconnect();
+    await pool.end();
   }
 }
 
