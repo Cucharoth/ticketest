@@ -25,74 +25,109 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+**Resumen**
+
+Instrucciones rápidas para levantar la base de datos, ejecutar migraciones/seed y correr los tests del proyecto.
+
+**Requisitos**
+
+- **Docker / Docker Compose**: necesario para el servicio PostgreSQL definido en `database/docker-compose.yaml`.
+- **Node.js & npm**: para ejecutar comandos de Prisma y tests (`node >= 16` recomendado).
+
+**Variables de entorno**
+
+- Revisa `database/.env`. La conexión esperada por defecto es:
+
+  - `DATABASE_URL="postgresql://postgres:postgres@localhost:11000/ticket_test_db"`
+
+**Arrancar la base de datos (Docker)**
+
+- Desde la carpeta `database` levanta el contenedor PostgreSQL:
 
 ```bash
-$ npm install
+cd database
+docker-compose up -d
 ```
 
-## Compile and run the project
+- Notas sobre el seed (`db/init.sql`):
+  - El script `database/db/init.sql` se monta en `/docker-entrypoint-initdb.d/` y se ejecuta solo la primera vez que se inicializa el volumen de datos.
+  - Si necesitas re-ejecutar el `init.sql`, elimina el volumen y vuelve a levantar el servicio:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+docker-compose down -v
+docker-compose up -d
 ```
 
-## Run tests
+**Instalar dependencias y generar cliente Prisma**
+
+- Desde la raíz del proyecto:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
+npx prisma generate
 ```
 
-## Deployment
+**Migraciones (desarrollo / CI)**
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- Desarrollo (crea la migración y la aplica):
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma migrate dev --name init
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- Deploy en CI / producción (aplica migraciones ya generadas):
 
-## Resources
+```bash
+npx prisma migrate deploy
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+**Seed / Inicialización de datos**
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- Si dependes de `database/db/init.sql` el seed ya se aplica al crear el volumen (ver sección Docker arriba).
+- Si prefieres usar `prisma db seed`, configura `package.json`/`prisma` y ejecuta:
 
-## Support
+```bash
+npx prisma db seed
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+(Actualmente este repo incluye `database/db/init.sql` como mecanismo de seed en Docker.)
 
-## Stay in touch
+**Ejecutar la aplicación y tests**
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Ejecutar en desarrollo:
 
-## License
+```bash
+npm run start:dev
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Tests unitarios:
+
+```bash
+npm run test
+```
+
+- Tests e2e:
+
+```bash
+npm run test:e2e
+```
+
+**Comandos rápidos (resumen)**
+
+- Levantar DB: `cd database && docker-compose up -d`
+- Forzar seed de `init.sql`: `docker-compose down -v && docker-compose up -d`
+- Generar cliente Prisma: `npx prisma generate`
+- Migraciones dev: `npx prisma migrate dev --name init`
+- Aplicar migraciones (prod): `npx prisma migrate deploy`
+- Ejecutar tests: `npm run test` / `npm run test:e2e`
+
+**Resolución de problemas**
+
+- Si Prisma no conecta: comprueba `DATABASE_URL` en `database/.env` y que el contenedor esté sano (`docker ps` / `docker logs db.local`).
+- El `init.sql` solo se ejecuta en una base de datos vacía; borra el volumen si necesitas re-ejecutarlo.
+
+**¿Siguiente?**
+
+- ¿Quieres que añada un script `npm` para levantar la DB desde la raíz o que genere un `Makefile` con los comandos más usados? 
+
+Archivo generado automáticamente por el asistente.
