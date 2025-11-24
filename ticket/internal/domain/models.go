@@ -37,6 +37,14 @@ type Attendee struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type AttendeeEvent struct {
+	AttendeeId string `json:"attendee_id"`
+	EventId    string `json:"event_id"`
+	Confirmed  bool   `json:"confirmed"`
+	CreatedAt  string `json:"created_at"`
+	UpdatedAt  string `json:"updated_at"`
+}
+
 func NewTicket(id string, price float64, typeId string, createdAt string, updatedAt string) *Ticket {
 	return &Ticket{
 		Id:        id,

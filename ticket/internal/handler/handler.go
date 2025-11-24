@@ -46,6 +46,10 @@ func (h *Handler) verifyAvailability(c *gin.Context) {
 
 	ok, err := h.Service.VerifyAvailability(ctx, h.BaseURL, eventID)
 	if err != nil {
+		if err == domain.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -96,7 +100,6 @@ func (h *Handler) reserveTicket(c *gin.Context) {
 }
 
 // updateTicket handles PATCH /tickets/:id
-// Accepts partial fields as JSON and returns the updated ticket.
 func (h *Handler) updateTicket(c *gin.Context) {
 	ticketID := c.Param("id")
 	var updatedInfo map[string]interface{}

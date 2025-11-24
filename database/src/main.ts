@@ -16,7 +16,6 @@ export async function bootstrap() {
   );
 
   const logger = app.get(Logger);
-
   app.useLogger(logger);
   app.flushLogs();
 
