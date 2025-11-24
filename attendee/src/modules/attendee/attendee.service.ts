@@ -11,12 +11,14 @@ import { ConfirmAttendeeDto } from './dto/confirm-attendee.dto';
 export class AttendeeService {
   private readonly logger = new Logger(AttendeeService.name);
   private readonly dbServiceUrl: string;
+  private readonly notificationServiceUrl: string;
 
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
     this.dbServiceUrl = this.configService.get<string>('env.dbServiceUrl') ?? 'http://localhost:3000';
+    this.notificationServiceUrl = this.configService.get<string>('env.notificationServiceUrl') ?? 'http://localhost:33205';
   }
 
   async create(createAttendeeEventDto: CreateAttendeeEventDto) {
@@ -32,7 +34,11 @@ export class AttendeeService {
       );
 
       this.logger.log(`Attendee created: ${attendee.id}`);
-      // 2. Link to Event
+      
+      // 2. Send welcome notification
+      await this.sendWelcomeNotification(attendee.id, attendee.name);
+      
+      // 3. Link to Event
       if (createAttendeeEventDto.eventId) {
         await firstValueFrom(
           this.httpService.post(`${this.dbServiceUrl}/attendee-events`, {
@@ -102,6 +108,10 @@ export class AttendeeService {
       const { data } = await firstValueFrom(
         this.httpService.post(`${this.dbServiceUrl}/attendee-events/confirm/${confirmAttendeeDto.attendeeId}`, confirmAttendeeDto),
       );
+      
+      // Send confirmation notification
+      await this.sendConfirmationNotification(confirmAttendeeDto.attendeeId, data.attendee?.name || 'Asistente');
+      
       return data;
     } catch (error) {
       this.handleError(error);
@@ -117,6 +127,40 @@ export class AttendeeService {
       return data;
     } catch (error) {
       this.handleError(error);
+    }
+  }
+
+  private async sendWelcomeNotification(attendeeId: string, attendeeName: string) {
+    try {
+      this.logger.log(`Sending welcome notification to attendee: ${attendeeId}`);
+      await firstValueFrom(
+        this.httpService.post(`${this.notificationServiceUrl}/api/notifications/send`, {
+          attendee_id: attendeeId,
+          message: `Bienvenido ${attendeeName}! Gracias por registrarte.`,
+          type: '30000000-0000-0000-0000-000000000001', // Email notification type UUID
+        }),
+      );
+      this.logger.log(`Welcome notification sent to attendee: ${attendeeId}`);
+    } catch (error) {
+      // Log error but don't fail the attendee creation
+      this.logger.warn(`Failed to send welcome notification to attendee ${attendeeId}: ${error}`);
+    }
+  }
+
+  private async sendConfirmationNotification(attendeeId: string, attendeeName: string) {
+    try {
+      this.logger.log(`Sending confirmation notification to attendee: ${attendeeId}`);
+      await firstValueFrom(
+        this.httpService.post(`${this.notificationServiceUrl}/api/notifications/send`, {
+          attendee_id: attendeeId,
+          message: `¡Hola ${attendeeName}! Tu asistencia ha sido confirmada exitosamente.`,
+          type: '30000000-0000-0000-0000-000000000001', // Email notification type UUID
+        }),
+      );
+      this.logger.log(`Confirmation notification sent to attendee: ${attendeeId}`);
+    } catch (error) {
+      // Log error but don't fail the confirmation
+      this.logger.warn(`Failed to send confirmation notification to attendee ${attendeeId}: ${error}`);
     }
   }
 

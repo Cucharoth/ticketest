@@ -36,4 +36,44 @@ describe('Attendee Module Smoke Tests', () => {
       .get('/attendee-events')
       .expect(200);
   });
+
+  /**
+   * HUMO-04 (AST -> NOT): POST /attendee-events -> 201 Created -> Notification sent
+   * Verifies that creating an attendee triggers a notification to be sent
+   */
+  it('HUMO-04: POST /attendee-events - should create attendee and trigger notification', async () => {
+    const dto = {
+      name: 'Smoke Test User',
+      email: `smoke-${Date.now()}@test.com`,
+      cellphone: '9876543210',
+    };
+
+    const response = await request(app.getHttpServer())
+      .post('/attendee-events')
+      .send(dto)
+      .expect(201);
+
+    expect(response.body).toHaveProperty('id');
+    expect(response.body.name).toBe(dto.name);
+    
+    const attendeeId = response.body.id;
+    
+    // Wait a bit for async notification to be processed
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Verify notification was sent by checking the database
+    const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:3000';
+    const notificationResponse = await request(dbServiceUrl)
+      .get('/notifications')
+      .expect(200);
+    
+    // Find notification for this attendee
+    const notifications = notificationResponse.body;
+    const welcomeNotification = notifications.find(
+      (n: any) => n.attendeeId === attendeeId && n.message.includes('Bienvenido')
+    );
+    
+    expect(welcomeNotification).toBeDefined();
+    expect(welcomeNotification.attendeeId).toBe(attendeeId);
+  });
 });
