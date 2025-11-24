@@ -27,10 +27,17 @@ func TestReserveEventSuccess(t *testing.T) {
 		path := r.URL.Path
 
 		switch {
-		// 1) Check attendee-event mapping: treat as not found (no prior reservation)
+		// 1) Check attendee-event mapping: return existing mapping (confirmed=false)
 		case r.Method == http.MethodGet && strings.HasPrefix(path, "/attendee-events/"):
-			// Return 404 Not Found to signal no existing reservation
-			w.WriteHeader(http.StatusNotFound)
+			// Return 200 OK with mapping indicating not yet confirmed
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			mapping := map[string]interface{}{
+				"id":        "mapping-123",
+				"ticket_id": "",
+				"confirmed": false,
+			}
+			_ = json.NewEncoder(w).Encode(mapping)
 			return
 
 		// 2) Create ticket: POST /events/{id}/tickets
@@ -47,7 +54,13 @@ func TestReserveEventSuccess(t *testing.T) {
 			_ = json.NewEncoder(w).Encode(t)
 			return
 
-		// 3) Create attendee-event mapping: POST /attendee-events
+		// 3) Update attendee-event mapping: PATCH /attendee-events/{id}
+		case r.Method == http.MethodPatch && strings.HasPrefix(path, "/attendee-events/"):
+			// Simulate successful patch attaching the ticket_id to existing mapping
+			w.WriteHeader(http.StatusOK)
+			return
+
+		// 4) Create attendee-event mapping (fallback - should not be used in the new flow)
 		case r.Method == http.MethodPost && path == "/attendee-events":
 			w.WriteHeader(http.StatusCreated)
 			return

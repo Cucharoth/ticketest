@@ -116,12 +116,37 @@ func VerifyAvailability(ctx context.Context, baseURL, id string) (bool, error) {
 func ReserveEvent(ctx context.Context, baseURL, eventId, attendeeId string, ticketReq *domain.Ticket) (*domain.Attendee, *domain.Ticket, *domain.Event, error) {
 	client := newHTTPClient()
 
-	// 1) Check if attendee already has a reservation for the event.
+	// 1) Check if attendee-event mapping exists and inspect confirmed flag.
 	checkURL := fmt.Sprintf("%s/attendee-events/%s/attendees/%s", baseURL, eventId, attendeeId)
-	_, err := doRequest(ctx, client, http.MethodGet, checkURL, nil, nil, http.StatusOK, http.StatusNoContent)
-	if err == nil {
-		// 200 OK -> attendee already reserved
-		return nil, nil, nil, fmt.Errorf("attendee %s already has a reservation for event %s", attendeeId, eventId)
+
+	// mapping will contain the existing attendee-event mapping when present.
+	var mapping map[string]interface{}
+	_, err := doRequest(ctx, client, http.MethodGet, checkURL, nil, &mapping, http.StatusOK)
+	if err != nil {
+		// If mapping not found, instruct caller to register attendee to the event first.
+		if errors.Is(err, domain.ErrNotFound) {
+			return nil, nil, nil, fmt.Errorf("attendee-event mapping not found for attendee %s and event %s; attendee must be registered to the event first", attendeeId, eventId)
+		}
+		return nil, nil, nil, fmt.Errorf("check attendee-event mapping: %w", err)
+	}
+
+	// When mapping is present, inspect the confirmed flag.
+	// Default to false when the field is missing or not a boolean.
+	if v, ok := mapping["confirmed"]; ok {
+		if confirmed, ok := v.(bool); ok && confirmed {
+			return nil, nil, nil, fmt.Errorf("attendee %s already confirmed for event %s", attendeeId, eventId)
+		}
+	}
+
+	// extract mapping ID to allow updating the existing mapping
+	var mappingID string
+	if idv, ok := mapping["id"].(string); ok {
+		mappingID = idv
+	} else if idv, ok := mapping["id"].(float64); ok {
+		// JSON numbers may decode as float64; convert to integer-like string if present.
+		mappingID = fmt.Sprintf("%.0f", idv)
+	} else {
+		mappingID = ""
 	}
 
 	// 2) Create ticket for the event
@@ -132,18 +157,21 @@ func ReserveEvent(ctx context.Context, baseURL, eventId, attendeeId string, tick
 		return nil, nil, nil, fmt.Errorf("create ticket: %w", err)
 	}
 
-	// 3) Create attendee-event mapping
-	attendeeEventCreateURL := fmt.Sprintf("%s/attendee-events", baseURL)
-	attendeeEventBody := map[string]string{
-		"event_id":    eventId,
-		"attendee_id": attendeeId,
-		"ticket_id":   createdTicket.Id,
+	// 3) Update existing attendee-event mapping to attach the created ticket.
+	if mappingID == "" {
+		// Without a mapping ID we cannot patch the existing record; return an error
+		// and provide the created ticket so the caller can reconcile/compensate.
+		return nil, &createdTicket, nil, fmt.Errorf("attendee-event mapping id not present for attendee %s and event %s", attendeeId, eventId)
 	}
-	_, err = doRequest(ctx, client, http.MethodPost, attendeeEventCreateURL, attendeeEventBody, nil, http.StatusCreated, http.StatusOK)
+
+	attendeeEventPatchURL := fmt.Sprintf("%s/attendee-events/%s", baseURL, mappingID)
+	attendeeEventBody := map[string]string{
+		"ticket_id": createdTicket.Id,
+	}
+	_, err = doRequest(ctx, client, http.MethodPatch, attendeeEventPatchURL, attendeeEventBody, nil, http.StatusOK, http.StatusAccepted)
 	if err != nil {
-		// If mapping fails, we should consider a compensation (e.g., delete ticket).
-		// For now, propagate error to caller for them to reconcile.
-		return nil, &createdTicket, nil, fmt.Errorf("create attendee-event mapping: %w", err)
+		// If mapping update fails, consider compensation for created ticket.
+		return nil, &createdTicket, nil, fmt.Errorf("update attendee-event mapping: %w", err)
 	}
 
 	// 4) Fetch current event and update counters atomically via the events service.
