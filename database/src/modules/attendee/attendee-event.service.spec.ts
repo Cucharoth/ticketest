@@ -126,6 +126,7 @@ describe('AttendeeEventService', () => {
       expect(result).toEqual(items);
       expect(mockPrismaService.attendeeEvent.findMany).toHaveBeenCalledWith({
         orderBy: { createdAt: 'desc' },
+        include: { event: true, attendee: true },
       });
     });
 
