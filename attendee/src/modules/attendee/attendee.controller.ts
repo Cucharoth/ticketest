@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { AttendeeService } from './attendee.service';
-import { CreateAttendeeDto } from './dto/create-attendee.dto';
+import { CreateAttendeeEventDto } from './dto/create-attendee-event.dto';
 import { UpdateAttendeeDto } from './dto/update-attendee.dto';
 import { Logger } from '@nestjs/common';
 
@@ -10,9 +10,9 @@ export class AttendeeController {
   constructor(private readonly attendeeService: AttendeeService) {}
 
   @Post()
-  create(@Body() createAttendeeDto: CreateAttendeeDto) {
-    this.logger.log(`Attendee Controller create Called: ${JSON.stringify(createAttendeeDto)}`);
-    return this.attendeeService.create(createAttendeeDto);
+  create(@Body() createAttendeeEventDto: CreateAttendeeEventDto) {
+    this.logger.log(`Attendee Controller create Called: ${JSON.stringify(createAttendeeEventDto)}`);
+    return this.attendeeService.create(createAttendeeEventDto);
   }
 
   @Get()

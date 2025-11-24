@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { CreateAttendeeDto } from './dto/create-attendee.dto';
+import { CreateAttendeeEventDto } from './dto/create-attendee-event.dto';
 import { UpdateAttendeeDto } from './dto/update-attendee.dto';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
@@ -18,13 +18,29 @@ export class AttendeeService {
     this.dbServiceUrl = this.configService.get<string>('env.dbServiceUrl') ?? 'http://localhost:3000';
   }
 
-  async create(createAttendeeDto: CreateAttendeeDto) {
-    this.logger.log(`Creating Attendee name: ${createAttendeeDto.name}`);
+  async create(createAttendeeEventDto: CreateAttendeeEventDto) {
+    this.logger.log(`Creating Attendee name: ${createAttendeeEventDto.name}`);
     try {
-      const { data } = await firstValueFrom(
-        this.httpService.post(`${this.dbServiceUrl}/attendees`, createAttendeeDto),
+      // 1. Create Attendee
+      const { data: attendee } = await firstValueFrom(
+        this.httpService.post(`${this.dbServiceUrl}/attendees`, {
+          name: createAttendeeEventDto.name,
+          email: createAttendeeEventDto.email,
+          cellphone: createAttendeeEventDto.cellphone,
+        }),
       );
-      return data;
+
+      // 2. Link to Event
+      if (createAttendeeEventDto.eventId) {
+        await firstValueFrom(
+          this.httpService.post(`${this.dbServiceUrl}/attendee-events`, {
+            attendeeId: attendee.id,
+            eventId: createAttendeeEventDto.eventId,
+          }),
+        );
+      }
+
+      return attendee;
     } catch (error) {
       this.handleError(error);
     }

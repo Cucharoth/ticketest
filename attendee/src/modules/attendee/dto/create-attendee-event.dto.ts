@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
-export class CreateAttendeeDto {
+export class CreateAttendeeEventDto {
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -15,4 +15,8 @@ export class CreateAttendeeDto {
     message: 'Cellphone must be a valid phone number',
   })
   cellphone: string;
+
+  @IsNotEmpty()
+  @IsString()
+  eventId: string;
 }
